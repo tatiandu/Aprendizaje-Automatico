@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Sep 16 16:07:39 2021
-
-@author: friki
-"""
-
+#scipy.integrate.quad
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,7 +21,7 @@ def fast_dot_product(x1, x2):
     toc = time.process_time()
     return 1000 * (toc - tic)
     
-def compara_tiempos():
+def compara_tiempos_():
     sizes = np.linspace(100, 10000000, 20)
     times_dot = []
     times_fast = []
@@ -42,13 +36,42 @@ def compara_tiempos():
     plt.legend()
     plt.savefig('time.png')
 
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 def cuadratica(x):
     return x * x
-    
-def integra_mc(fun, a, b, num_puntos=10000):
-    'Cálculo de M'
+
+def integra_mc_iterativo(fun, a, b, num_puntos=10000):
+    tic = time.process_time()
+    #Calculo de M
     intervalo = np.linspace(a, b, num_puntos)
-    M = cuadratica(intervalo).max()
-    'Calculamos num_puntos aleatorios'
-    ran_x = np.random.rand()
-integra_mc(cuadratica, 0, 50)
+    M = fun(intervalo).max()
+    #Calculamos num_puntos aleatorios
+    num_debajo = 0
+    for i in range(num_puntos):
+        ran_x = np.random.rand() * (b-a) + a
+        ran_y = np.random.rand() * M
+        if(fun(ran_x) > ran_y):
+            num_debajo += 1
+    #Calculo de la integral
+    integral = (num_debajo/num_puntos) * (b-a) * M
+    toc = time.process_time()
+    return (integral, (toc-tic)*1000)
+
+def integra_mc_vectorizado(fun, a, b, num_puntos=10000):
+    tic = time.process_time()
+    #Calculo de M
+    intervalo = np.linspace(a, b, num_puntos)
+    M = fun(intervalo).max()
+    #Calculamos num_puntos aleatorios
+    ran_x = np.random.rand(num_puntos) * (b-a) + a
+    ran_y = np.random.rand(num_puntos) * M
+    num_debajo = sum(fun(ran_x) > ran_y)
+    #Calculo de la integral
+    integral = (num_debajo/num_puntos) * (b-a) * M
+    toc = time.process_time()
+    return (integral, (toc-tic)*1000)
+
+def compara_tiempos():
+    print("a")
+
