@@ -21,7 +21,7 @@ def descenso_gradiente(theta0, theta1, x, y, alpha = 0.01, num_it = 1500):
     return (theta0, theta1)
 
 
-def coste(x, y, arrayThetas):
+def coste(x, y, arrayThetas): #Funcion de coste
     m = len(x)
     sum0 = 0
     for i in range(m):
@@ -37,7 +37,7 @@ def make_data(rangoT0, rangoT1, x, y):
     theta0, theta1 = np.meshgrid(theta0, theta1)
 
     costeF = np.empty_like(theta0)
-    for ix, iy in np.ndindex(theta0.shape):
+    for ix, iy in np.ndindex(theta0.shape): #Itera por todas las dimensiones de la matriz
         costeF[ix, iy] = coste(x, y, [theta0[ix, iy], theta1[ix, iy]])
 
     return [theta0, theta1, costeF] 
@@ -60,7 +60,7 @@ def regresion_lineal_una_variable():
     plt.show()
     plt.savefig("resultado1.png")
 
-    x, y, z = make_data((-10, 10), (-1, 4), x, y) #falta returm
+    x, y, z = make_data((-10, 10), (-1, 4), x, y)
 
     fig = plt.figure()
     ax = fig.gca(projection = "3d")
@@ -68,4 +68,22 @@ def regresion_lineal_una_variable():
     plt.show()
     plt.savefig("resultado2.png")
 
-regresion_lineal_una_variable()
+def matriz_norm(matriz):
+    nCols = matriz.shape[1]
+    matriz_norm = np.empty_like(matriz)
+    mu = np.empty_like(matriz[0])
+    sigma = np.empty_like(matriz[0])
+    for n in range(nCols):
+        mu[n] = np.median(matriz[:, n])
+        sigma[n] = np.std(matriz[:, n])
+        sum = np.linalg.norm
+        matriz_norm[:,n] = (matriz[:,n] / (np.sum(matriz[:, n])))
+    return (matriz_norm, mu, sigma)
+
+def regresion_varias_variables():
+    datos = carga_csv("ex1data2.csv")
+    datos_norm, mu, sigma = matriz_norm(datos)
+    print(datos_norm)
+    return 0
+
+regresion_varias_variables()
