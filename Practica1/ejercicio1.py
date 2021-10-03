@@ -83,7 +83,12 @@ def matriz_norm(matriz):
 def regresion_varias_variables():
     datos = carga_csv("ex1data2.csv")
     datos_norm, mu, sigma = matriz_norm(datos)
-    print(datos_norm)
+    X = datos_norm[:, :]
+    X = datos_norm[:, :-1]
+    Y = datos_norm[:, -1]
+    m = np.shape(X)[0]
+    n = np.shape(X)[1]
+    X = np.hstack([np.ones([m,1]),X])
     return 0
 
 regresion_varias_variables()
