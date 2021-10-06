@@ -59,7 +59,6 @@ def regresion_lineal_una_variable():
     minY = thetas[0] + thetas[1] * minX
     maxY = thetas[0] + thetas[1] * maxX
     plt.plot([minX, maxX], [minY, maxY], c="green")
-    plt.show()
     plt.savefig("descensoGrad.png")
 
     x, y, z = make_data((-10, 10), (-1, 4), x, y)
@@ -67,8 +66,12 @@ def regresion_lineal_una_variable():
     fig = plt.figure()
     ax = fig.gca(projection = "3d")
     ax.plot_surface(x, y, z, cmap = cm.rainbow, linewidth=0, antialiased=False)
-    plt.show()
     plt.savefig("grafica3D.png")
+
+    plt.figure()
+    plt.plot(thetas[0], thetas[1], "x", c="orange")
+    plt.contour(x, y, z, np.logspace(-2, 3, 20))
+    plt.savefig("graficaContorno.png")
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -148,6 +151,6 @@ def compara_funciones():
     print("Descenso de gradiente: " + str(prediccion_gradiente))
     print("Ecuación normal: " + str(prediccion_normal))
 
-compara_funciones()
+regresion_lineal_una_variable()
 #regresion_varias_variables()
-#regresion_lineal_una_variable()
+#compara_funciones()
