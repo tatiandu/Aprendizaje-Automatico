@@ -4,27 +4,29 @@ import scipy.optimize as opt
 from  pandas.io.parsers import read_csv
 
 def carga_csv(file_name):
-    valores = read_csv(file_name,  header=None).to_numpy()
+    valores = read_csv(file_name, header=None).to_numpy()
     return valores.astype(float)
 
 
 def sigmoide(z): #g(z)
-    return 1.0 / (1.0 + np.exp(-z))
+    return 1 / (1 + np.exp(-z))
+# def sigmoide(Z):
+#     return 1 /(1 + np.e**(-Z))
 
 
-def coste(x, y, theta):
-    H = sigmoide(np.matmul(x, theta))
-    op1 = np.dot(np.transpose(np.log(H)), y)
-    op2 = np.dot(np.transpose(np.log(1-H)), (1-y))
-    return -(op1 + op2) / len(x) #len(x) = m
+def coste(theta, x, y):
+    H = sigmoide(np.dot(x, theta))
+    op1 = np.dot(np.log(H), y)
+    op2 = np.dot(np.log(1 - H), (1 - y))
+    return -(op1 + op2) / len(x) #np.shape(x)[0]
 
 
-def gradiente(x, y, theta):
-    H = sigmoide(np.matmul(x, theta))
-    return (np.dot(np.transpose(x), (H-y))) / len(x) #len(x)=m
+def gradiente(theta, x, y):
+    H = sigmoide(np.dot(x, theta))
+    return np.dot((H - y), x) / len(y) #np.shape(x)[0]
 
 
-def pinta_frontera_recta(x, y, theta):
+def pinta_frontera_recta(x, theta):
     plt.figure()
     x1min, x1max = x[:, 0].min(), x[:, 0].max()
     x2min, x2max = x[:, 1].min(), x[:, 1].max()
@@ -32,7 +34,7 @@ def pinta_frontera_recta(x, y, theta):
     xx1, xx2 = np.meshgrid(np.linspace(x1min, x1max), np.linspace(x2min, x2max))
 
     h = sigmoide(np.c_[np.ones((xx1.ravel().shape[0], 1)), xx1.ravel(), xx2.ravel()].dot(theta))
-    h.reshape(xx1.shape)
+    h = h.reshape(xx1.shape)
 
     plt.contour(xx1, xx2, h, [0.5], linewidths=1, c="black")
     plt.savefig("frontera.png")
@@ -54,14 +56,19 @@ def regresion_logistica():
     plt.savefig("graficaAdmision.png")
 
     x_aux = np.hstack([np.ones([np.shape(x)[0], 1]), x])
-    theta = np.zeros(len(x_aux[0]))
-    costeEjemplo = coste(x_aux, y, theta)
-    gradienteEjemplo = gradiente(x_aux, y, theta)
+    theta = np.zeros(np.shape(x_aux)[1])
+    costeEjemplo = coste(theta, x_aux, y)
+    gradienteEjemplo = gradiente(theta, x_aux, y)
     print("Coste: " + str(costeEjemplo))
     print("Gradiente: " + str(gradienteEjemplo))
 
-    res = opt.fmin_tnc(func=coste, x0=theta, fprime=gradiente, args=(x_aux, y))
+    res = opt.fmin_tnc(func=coste, x0=theta, fprime=gradiente, args=(x_aux, y), messages=0)
     theta_opt = res[0]
     print("Theta optimización: " + str(theta_opt))
+    costeOptimo = coste(theta_opt, x_aux, y)
+    print("Coste óptimo: " + str(costeOptimo))
+    
+    pinta_frontera_recta(x_aux, theta_opt)
+
 
 regresion_logistica()
