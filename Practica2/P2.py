@@ -27,9 +27,8 @@ def gradiente(theta, x, y):
 
 
 def pinta_frontera_recta(x, theta):
-    plt.figure()
-    x1min, x1max = x[:, 0].min(), x[:, 0].max()
-    x2min, x2max = x[:, 1].min(), x[:, 1].max()
+    x1min, x1max = x[:, 1].min(), x[:, 1].max()
+    x2min, x2max = x[:, 2].min(), x[:, 2].max()
 
     xx1, xx2 = np.meshgrid(np.linspace(x1min, x1max), np.linspace(x2min, x2max))
 
