@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 from  pandas.io.parsers import read_csv
+from sklearn.preprocessing import PolynomialFeatures
 
 def carga_csv(file_name):
     valores = read_csv(file_name, header=None).to_numpy()
@@ -52,8 +53,9 @@ def regresion_logistica():
     neg = np.where(y == 0)
 
     plt.figure()
-    plt.scatter(x[pos, 0], x[pos, 1], marker="+", c="blue", label="Admitido")
-    plt.scatter(x[neg, 0], x[neg, 1], marker="o", c="red", label="No admitido")
+    plt.scatter(x[pos, 0], x[pos, 1], marker="+", c="blue")
+    plt.scatter(x[neg, 0], x[neg, 1], marker="o", c="red")
+    plt.legend(["Admitido","No admitido"])
     plt.xlabel("Nota en el examen 1º")
     plt.ylabel("Nota en el examen 2º")
     plt.savefig("graficaAdmision.png")
@@ -75,5 +77,43 @@ def regresion_logistica():
     
     pinta_frontera_recta(x_aux, theta_opt)
 
+#==================================================================================================00
 
-regresion_logistica()
+def coste_reg(theta, x, y, lamda):
+    op1 = coste(theta, x, y)
+    op2 = lamda * (theta**2).sum() / (2*len(x))
+    return op1 + op2
+
+
+def gradiente_reg(theta, x, y, lamda):
+    op1 = gradiente(theta, x, y)
+    op2 = lamda * theta / len(y)
+    return op1 + op2
+
+
+def regresion_logistica_regularizada():
+    datos = carga_csv("ex2data2.csv")
+    x = datos[:, :-1]
+    y = datos[:, -1]
+    pos = np.where(y == 1)
+    neg = np.where(y == 0)
+
+    plt.figure()
+    plt.scatter(x[pos, 0], x[pos, 1], marker="+", c="blue")
+    plt.scatter(x[neg, 0], x[neg, 1], marker="o", c="red")
+    plt.legend(["y = 1", "y = 0"])
+    plt.xlabel("Microchip test 1")
+    plt.ylabel("Microchip test 2")
+    plt.savefig("graficaMicrochips.png")
+
+    poly = PolynomialFeatures(6)
+    mapFeature = poly.fit_transform(x)
+    theta = np.zeros(np.shape(mapFeature)[1])
+
+    coste = coste_reg(theta, x, y, 1)
+    print(coste)
+    
+
+
+regresion_logistica_regularizada()
+#regresion_logistica()
