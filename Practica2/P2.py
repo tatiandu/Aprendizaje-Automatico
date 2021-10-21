@@ -10,20 +10,18 @@ def carga_csv(file_name):
 
 def sigmoide(z): #g(z)
     return 1 / (1 + np.exp(-z))
-# def sigmoide(Z):
-#     return 1 /(1 + np.e**(-Z))
 
 
 def coste(theta, x, y):
     H = sigmoide(np.dot(x, theta))
     op1 = np.dot(np.log(H), y)
     op2 = np.dot(np.log(1 - H), (1 - y))
-    return -(op1 + op2) / len(x) #np.shape(x)[0]
+    return -(op1 + op2) / len(x)
 
 
 def gradiente(theta, x, y):
     H = sigmoide(np.dot(x, theta))
-    return np.dot((H - y), x) / len(y) #np.shape(x)[0]
+    return np.dot((H - y), x) / len(y)
 
 
 def pinta_frontera_recta(x, theta):
@@ -38,6 +36,12 @@ def pinta_frontera_recta(x, theta):
     plt.contour(xx1, xx2, h, [0.5], linewidths=1, c="black")
     plt.savefig("frontera.png")
     plt.close()
+
+
+def evaluacion_regresion(theta, x, y):
+    H = sigmoide(np.dot(x, theta))
+    admitidos = np.mean((H >= 0.5) == y)
+    return admitidos
 
 
 def regresion_logistica():
@@ -63,9 +67,11 @@ def regresion_logistica():
 
     res = opt.fmin_tnc(func=coste, x0=theta, fprime=gradiente, args=(x_aux, y), messages=0)
     theta_opt = res[0]
-    print("Theta optimización: " + str(theta_opt))
     costeOptimo = coste(theta_opt, x_aux, y)
     print("Coste óptimo: " + str(costeOptimo))
+
+    evaluacion = evaluacion_regresion(theta_opt, x_aux, y)
+    print("Evaluación de la regresión logística: " + str(evaluacion*100) + "%")
     
     pinta_frontera_recta(x_aux, theta_opt)
 
