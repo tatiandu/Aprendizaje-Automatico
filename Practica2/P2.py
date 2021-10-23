@@ -52,7 +52,7 @@ def pinta_frontera_recta(x, theta):
     plt.close()
 
 
-def plot_decisionboundary(x, theta, poly):
+def plot_decisionboundary(x, theta, poly, color):
     x1min, x1max = x[:, 0].min(), x[:, 0].max()
     x2min, x2max = x[:, 1].min(), x[:, 1].max()
     xx1, xx2 = np.meshgrid(np.linspace(x1min, x1max), np.linspace(x2min, x2max))
@@ -60,20 +60,14 @@ def plot_decisionboundary(x, theta, poly):
     h = sigmoide(poly.fit_transform(np.c_[xx1.ravel(), xx2.ravel()]).dot(theta))
     h = h.reshape(xx1.shape)
 
-    plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors="black")
+    plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors=color)
     plt.savefig("frontera2.png")
-    plt.close()
 
 
 def evaluacion_regresion(theta, x, y):
     H = sigmoide(np.dot(x, theta))
     admitidos = np.mean((H >= 0.5) == y)
     return admitidos
-
-
-def evaluacion_regularizacion():
-
-    return
 
 
 def regresion_logistica():
@@ -103,11 +97,10 @@ def regresion_logistica():
     costeOptimo = coste(theta_opt, x_aux, y)
     print("Coste óptimo: " + str(costeOptimo)[:5])
 
+    pinta_frontera_recta(x_aux, theta_opt)
     evaluacion = evaluacion_regresion(theta_opt, x_aux, y)
     print("Evaluación de la regresión logística: " + str(evaluacion*100) + "%")
     
-    pinta_frontera_recta(x_aux, theta_opt)
-
 
 def regresion_logistica_regularizada():
     datos = carga_csv("ex2data2.csv")
@@ -127,16 +120,21 @@ def regresion_logistica_regularizada():
     poly = PolynomialFeatures(6)
     mapFeature = poly.fit_transform(x)
     theta = np.zeros(np.shape(mapFeature)[1])
-    lamda = 1
-    costeEjemplo = coste_reg(theta, mapFeature, y, lamda)
-    print("Coste regularizado: " + str(costeEjemplo)[:5])
+    costeEjemplo = coste_reg(theta, mapFeature, y, 1)
+    print("Coste regularizado (lambda = 1): " + str(costeEjemplo)[:5])
 
-    res = opt.fmin_tnc(func=coste_reg, x0=theta, fprime=gradiente_reg, args=(mapFeature, y, lamda), messages=0)
-    theta_opt = res[0]
-    costeOptimo = coste_reg(theta_opt, mapFeature, y, lamda)
-    print("Coste regularizado óptimo: " + str(costeOptimo)[:5])
+    lamdas = np.linspace(0.1, 10, 9)
+    colors = ["salmon", "darkturquoise", "purple", "gold", "orangered",
+              "blueviolet", "hotpink", "limegreen", "dodgerblue"]
+    for lamda, color in zip(lamdas, colors): #10 ejemplos
+        res = opt.fmin_tnc(func=coste_reg, x0=theta, fprime=gradiente_reg, args=(mapFeature, y, lamda), messages=0)
+        theta_opt = res[0]
+        costeOptimo = coste_reg(theta_opt, mapFeature, y, lamda)
+        print("Coste regularizado óptimo (lambda = " + str(lamda)[:3] + "): " + str(costeOptimo)[:5])
 
-    plot_decisionboundary(x, theta_opt, poly)
+        plot_decisionboundary(x, theta_opt, poly, color)
+
+    plt.close()
 
 
 #regresion_logistica()
