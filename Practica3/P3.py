@@ -38,23 +38,31 @@ def oneVsAll(X, y, n_labels, reg):
     Theta = np.zeros([n_labels, len(X[0])])
 
     for k in range(n_labels):
-        if(k == 0):
-            aux = 10
-        else:
-            aux = k
-        Theta[k] = opt.fmin_tnc(func=coste_reg, x0=Theta[k], fprime=gradiente_reg, args=(X, ((y==aux)*1).ravel(), reg), messages=0)[0]
+        aux = ((y == k+1)*1).ravel() #*1??
+        Theta[k] = opt.fmin_tnc(func=coste_reg, x0=Theta[k], fprime=gradiente_reg, args=(X, aux, reg), messages=0)[0]
 
     return Theta
 
+# def oneVsAll2(X, y, num_etiquetas, reg): COPIADO JAJÁ
+#     matrizThetas = np.empty((num_etiquetas, np.shape(X)[1])) 
 
-def evaluacion_regresion(X, y, Theta):
+#     for i in range(num_etiquetas):
+#         aux = y == i + 1
+#         Theta = np.zeros(np.shape(X)[1])
+#         aux = np.ravel(aux)
+#         matrizThetas[i] = opt.fmin_tnc(func = coste_reg, x0 = Theta, fprime = gradiente_reg, args = (X, aux, reg), messages=0)[0]
+
+#     return matrizThetas    
+
+
+def evaluacion_regresion(X, y, Theta): #antes estaba con un for
     n = len(y)
     resultado = np.empty(n)
 
-    for k in range(n):
-        H = sigmoide(np.dot(X[k], Theta))
-        resultado[k] = np.argmax(H)+1 #+1????
+    H = sigmoide(np.dot(X, Theta.T))
+    resultado = np.argmax(H)+1 #+1????
 
+    y = y.ravel()
     return np.mean(resultado == y)
 
 
