@@ -33,10 +33,12 @@ def gradiente(theta, x, y):
 
 def gradiente_reg(theta, x, y, lamda):
     op1 = gradiente(theta, x, y)
-    aux = op1[0]
     op2 = lamda * theta / len(y)
-    op2[0] = aux
-    return op1 + op2
+
+    aux = op1[0]
+    result = op1 + op2
+    result[0] = aux
+    return result
 
 
 def pinta_frontera_recta(x, theta):
