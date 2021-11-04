@@ -56,6 +56,26 @@ def evaluacion_regresion(X, y, Theta):
     return np.mean(resultado == y)
 
 
+def red_neuronal(X, y):
+    weights = loadmat("ex3weights.mat")
+    Theta1 = weights["Theta1"]
+    Theta2 = weights["Theta2"]
+
+    # Capas
+    a1 = X
+    z2 = np.dot(Theta1, a1.T)
+    a2 = sigmoide(z2)
+    a2 = np.vstack([np.ones(len(a2[0])), a2])
+    z3 = np.dot(Theta2, a2)
+    a3 = sigmoide(z3)
+
+    resultado = np.empty(len(X))
+    for k in range(len(X)):
+        resultado[k] = np.argmax(a3[:,k]) + 1
+
+    return np.mean(resultado == y)
+
+
 def regresion_logistica_multiclase():
     datos = loadmat("ex3data1.mat")
     X = datos["X"]
@@ -75,6 +95,9 @@ def regresion_logistica_multiclase():
     Theta = oneVsAll(X_aux, y, n_labels, reg)
     evaluacion = evaluacion_regresion(X_aux, y, Theta)
     print("Evaluación de la regresión logística multiclase: " + str(evaluacion*100)[:5] + "%")
+
+    evaluacion_neuronal = red_neuronal(X_aux, y)
+    print("Evaluación de la red neuronal: " + str(evaluacion_neuronal*100)[:5] + "%")
 
 
 regresion_logistica_multiclase()
