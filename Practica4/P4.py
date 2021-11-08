@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import displayData as dD
 import checkNNGradients as checkNNG
 
-import pandas as pd
-
 
 def sigmoide(z): #g(z)
     return 1 / (1 + np.exp(-z))
@@ -59,7 +57,16 @@ def entrenamiento_redes_neuronales():
     datos = loadmat("ex4data1.mat")
     X = datos["X"]
     y = datos["y"]
-    #y = np.ravel(y)
+    y = np.ravel(y)
+
+    m = len(y)
+    input_size = X.shape[1] #TODO
+    n_labels = 10
+
+    y = (y-1)
+    y_onehot = np.zeros((m, n_labels))
+    for i in range(m):
+        y_onehot[i][y[i]] = 1
 
     #pinta 100 ejemplos
     # sample = np.random.choice(X.shape[0], 100)
@@ -72,7 +79,7 @@ def entrenamiento_redes_neuronales():
     Theta2 = weights["Theta2"]
 
     # y_matrix = pd.get_dummies(np.array(y).ravel()).values
-    # print(str(coste(X, y_matrix, Theta1, Theta2)))
+    print("Coste sin regularizar: " + str(coste(X, y_onehot, Theta1, Theta2)))
 
 
 
