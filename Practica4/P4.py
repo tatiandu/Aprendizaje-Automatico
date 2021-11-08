@@ -41,22 +41,35 @@ def forward_propagate(X, Theta1, Theta2):
     return A1, A2, H
 
 
-def back_propagate(X, y, Theta1, Theta2): #TODO está a medias
+def back_propagate (params_rn, n_input, n_hidden, n_labels, X, y, lamda):
+    Theta1 = np.reshape(params_rn[:n_hidden * (n_input+1)], (n_hidden, (n_input+1)))
+    Theta2 = np.reshape(params_rn[n_hidden * (n_input+1):], (n_labels, (n_hidden+1)))
+    
     m = np.shape(X)[0]
-    #m = X.shape[0]
-
     A1, A2, H = forward_propagate(X, Theta1, Theta2)
+
+
+    #TODO
+    # X = np.hstack([np.ones([m, 1]), X])??????
+    # coste_reg para el return
+    # inicializar deltas?
 
     for t in range(m):
         a1t = A1[t, :]
         a2t = A2[t, :]
         ht = H[t, :]
         yt = y[t]
+
         d3t = ht - yt
         d2t = np.dot(Theta2.T, d3t) * (a2t * (1 - a2t))
 
         Delta1 = Delta1 + np.dot(d2t[1:, np.newaxis], a1t[np.newaxis, :])
         Delta2 = Delta2 + np.dot(d3t[:, np.newaxis], a2t[np.newaxis, :])
+
+
+    #algo de calculos de gradiente
+
+    return #coste, gradiente
 
 
 def entrenamiento_redes_neuronales():
