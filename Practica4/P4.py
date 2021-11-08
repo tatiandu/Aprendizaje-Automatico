@@ -19,6 +19,12 @@ def coste(X, y, Theta1, Theta2):
     return np.sum(op1 + op2) / np.shape(X)[0]
 
 
+def coste_reg(X, y, Theta1, Theta2, lamda):
+    op1 = coste(X, y, Theta1, Theta2)
+    op2 = lamda * (np.sum(Theta1[:, 1:]**2) + np.sum(Theta2[:, 1:]**2)) / (2*np.shape(X)[0])
+    
+    return op1 + op2
+
 
 def forward_propagate(X, Theta1, Theta2):
     m = np.shape(X)[0]
@@ -78,9 +84,8 @@ def entrenamiento_redes_neuronales():
     Theta1 = weights["Theta1"]
     Theta2 = weights["Theta2"]
 
-    # y_matrix = pd.get_dummies(np.array(y).ravel()).values
-    print("Coste sin regularizar: " + str(coste(X, y_onehot, Theta1, Theta2)))
-
+    print("Coste sin regularizar: " + str(coste(X, y_onehot, Theta1, Theta2))[:5])
+    print("Coste regularizado con lambda=1: " + str(coste_reg(X, y_onehot, Theta1, Theta2, 1))[:5])
 
 
 
