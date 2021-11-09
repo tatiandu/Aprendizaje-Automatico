@@ -48,11 +48,8 @@ def back_propagate (params_rn, n_input, n_hidden, n_labels, X, y, lamda):
     m = np.shape(X)[0]
     A1, A2, H = forward_propagate(X, Theta1, Theta2)
 
-
-    #TODO
-    # X = np.hstack([np.ones([m, 1]), X])??????
-    # coste_reg para el return
-    # inicializar deltas?
+    Delta1 = np.zeros_like(Theta1)
+    Delta2 = np.zeros_like(Theta2)
 
     for t in range(m):
         a1t = A1[t, :]
@@ -66,10 +63,23 @@ def back_propagate (params_rn, n_input, n_hidden, n_labels, X, y, lamda):
         Delta1 = Delta1 + np.dot(d2t[1:, np.newaxis], a1t[np.newaxis, :])
         Delta2 = Delta2 + np.dot(d3t[:, np.newaxis], a2t[np.newaxis, :])
 
+    #Calculos de gradiente
+    gradiente1 = Delta1 / m
+    gradiente2 = Delta2 / m
+    lamda1 = lamda * Theta1 / m
+    lamda2 = lamda * Theta2 / m
 
-    #algo de calculos de gradiente
+    aux1 = gradiente1[:, 0]
+    aux2 = gradiente2[:, 0]
+    gradiente1 += lamda1
+    gradiente2 += lamda2
+    gradiente1[:, 0] = aux1
+    gradiente2[:, 0] = aux2
 
-    return #coste, gradiente
+    coste = coste_reg(X, y, Theta1, Theta2, lamda)
+    gradiente = np.concatenate((np.ravel(gradiente1), np.ravel(gradiente2)))
+
+    return coste, gradiente
 
 
 def entrenamiento_redes_neuronales():
@@ -100,7 +110,8 @@ def entrenamiento_redes_neuronales():
     print("Coste sin regularizar: " + str(coste(X, y_onehot, Theta1, Theta2))[:5])
     print("Coste regularizado con lambda=1: " + str(coste_reg(X, y_onehot, Theta1, Theta2, 1))[:5])
 
-
+    n_input, n_hidden, n_labels = 400, 25, 10
+    params_rn = np.concatenate([np.ravel(Theta1), np.ravel(Theta2)])
 
 
 entrenamiento_redes_neuronales()
