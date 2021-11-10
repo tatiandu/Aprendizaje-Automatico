@@ -87,7 +87,7 @@ def checkNNGradients(costNN, reg_param):
     numgrad = computeNumericalGradient(reduced_cost_func, nn_params)
 
     # Check two gradients
-    print('grad shape: ', grad.shape)
-    print('num grad shape: ', numgrad.shape)
+    # print('grad shape: ', grad.shape)
+    # print('num grad shape: ', numgrad.shape)
     np.testing.assert_almost_equal(grad, numgrad)
     return (grad - numgrad)

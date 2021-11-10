@@ -68,28 +68,23 @@ def back_propagate (params_rn, n_input, n_hidden, n_labels, X, y, lamda):
     gradiente2 = Delta2 / m
     lamda1 = lamda * Theta1 / m
     lamda2 = lamda * Theta2 / m
-
-    aux1 = gradiente1[:, 0]
-    aux2 = gradiente2[:, 0]
+    lamda1[:, 0] = lamda2[:, 0] = 0
     gradiente1 += lamda1
     gradiente2 += lamda2
-    gradiente1[:, 0] = aux1
-    gradiente2[:, 0] = aux2
 
-    coste = coste_reg(X, y, Theta1, Theta2, lamda)
+    coste = coste_reg(X, y, Theta1, Theta2, lamda) #TODO H por X???
     gradiente = np.concatenate((np.ravel(gradiente1), np.ravel(gradiente2)))
 
     return coste, gradiente
 
 
-def entrenamiento_redes_neuronales():
+def main():
     datos = loadmat("ex4data1.mat")
     X = datos["X"]
     y = datos["y"]
     y = np.ravel(y)
 
     m = len(y)
-    input_size = X.shape[1] #TODO
     n_labels = 10
 
     y = (y-1)
@@ -109,9 +104,12 @@ def entrenamiento_redes_neuronales():
 
     print("Coste sin regularizar: " + str(coste(X, y_onehot, Theta1, Theta2))[:5])
     print("Coste regularizado con lambda=1: " + str(coste_reg(X, y_onehot, Theta1, Theta2, 1))[:5])
+    print()
 
-    n_input, n_hidden, n_labels = 400, 25, 10
-    params_rn = np.concatenate([np.ravel(Theta1), np.ravel(Theta2)])
+    diff = checkNNG.checkNNGradients(back_propagate, 1)
+    print("Menor diferencia: " + str(min(diff)))
+    print("Mayor diferencia: " + str(max(diff)))
 
 
-entrenamiento_redes_neuronales()
+
+main()
