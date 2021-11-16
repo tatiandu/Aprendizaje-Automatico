@@ -72,10 +72,27 @@ def back_propagate (params_rn, n_input, n_hidden, n_labels, X, y, lamda):
     gradiente1 += lamda1
     gradiente2 += lamda2
 
-    coste = coste_reg(X, y, Theta1, Theta2, lamda) #TODO H por X???
+    coste = coste_reg(X, y, Theta1, Theta2, lamda)
     gradiente = np.concatenate((np.ravel(gradiente1), np.ravel(gradiente2)))
 
     return coste, gradiente
+
+
+def pesosAleatorios(L_ini, L_out):
+    E_ini = 0.12
+    return np.random.random((L_out, L_ini + 1)) * (2*E_ini) - E_ini
+
+
+def comprobar(resOpt, n_input, n_hidden, n_labels, X, y):
+    Theta1 = np.reshape(resOpt.x[:n_hidden * (n_input + 1)] , (n_hidden, (n_input+1)))
+    Theta2 = np.reshape(resOpt.x[n_hidden * (n_input + 1):] , (n_labels, (n_hidden+1)))
+
+    A1, A2, H = forward_propagate(X, Theta1, Theta2)
+
+    aux = np.argmax(H, axis=1)
+    aux += 1
+
+    return np.sum(aux == y) / np.shape(H)[0]
 
 
 def main():
@@ -85,12 +102,14 @@ def main():
     y = np.ravel(y)
 
     m = len(y)
+    n_input = np.shape(X)[1]
+    n_hidden = 25
     n_labels = 10
 
-    y = (y-1)
+    aux_y = (y-1)
     y_onehot = np.zeros((m, n_labels))
     for i in range(m):
-        y_onehot[i][y[i]] = 1
+        y_onehot[i][aux_y[i]] = 1
 
     #pinta 100 ejemplos
     # sample = np.random.choice(X.shape[0], 100)
@@ -106,10 +125,22 @@ def main():
     print("Coste regularizado con lambda=1: " + str(coste_reg(X, y_onehot, Theta1, Theta2, 1))[:5])
     print()
 
-    diff = checkNNG.checkNNGradients(back_propagate, 1)
+    lamda = 1
+    print("--Comprobación del gradiente--")
+    diff = checkNNG.checkNNGradients(back_propagate, lamda)
     print("Menor diferencia: " + str(min(diff)))
     print("Mayor diferencia: " + str(max(diff)))
+    print()
 
-
+    #Aprendizaje de los parámetros
+    Theta1 = pesosAleatorios(n_input, n_hidden)
+    Theta2 = pesosAleatorios(n_hidden, n_labels)
+    params_rn = np.concatenate((np.ravel(Theta1), np.ravel(Theta2)))
+    
+    #n_iters = 70
+    resOpt = opt.minimize(fun=back_propagate, x0=params_rn, args=(n_input, n_hidden, n_labels, X, y_onehot, lamda), method='TNC', jac=True, options={'maxiter': 70})
+    evaluacion = comprobar(resOpt, n_input, n_hidden, n_labels, X, y)
+    print("Evaluación del entrenamiento de la red: {}%".format(str(evaluacion*100)[:5]))
+    
 
 main()
