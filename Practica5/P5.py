@@ -44,6 +44,7 @@ def grafica_regresion_lineal_reg(Theta, X, y):
     plt.figure()
     plt.plot(X, y, "x", c="orange")
 
+    #Linea
     minX = np.amin(X)
     maxX = np.amax(X)
     minY = Theta[0] + Theta[1] * minX
@@ -115,20 +116,22 @@ def regresion_polinomial(X, Xval, y, yval, lamda, p):
     X_norm = np.hstack([np.ones([np.shape(X_norm)[0], 1]), X_norm])
 
     fmin = opt.minimize(fun=coste, x0=Theta, args=(X_norm, y, lamda))
+    grafica_regresion_polinomial(fmin.x, X, y, lamda, p, mu, sigma)
 
 
 def grafica_regresion_polinomial(Theta, X, y, lamda, p, mu, sigma):
     plt.figure()
     plt.plot(X, y, "x", c="orange")
 
-    #TODO
-    # minX = np.amin(X)
-    # maxX = np.amax(X)
-    # minY = Theta[0] + Theta[1] * minX
-    # maxY = Theta[0] + Theta[1] * maxX
-    # plt.plot([minX, maxX], [minY, maxY], c="limegreen")
+    #Linea
+    lineX = np.arange(np.amin(X)-5, np.amax(X)+5, 0.05)
+    auxX = genera_datos(lineX, p)
+    auxX = (auxX - mu)/sigma #Normalizamos
+    auxX = np.hstack([np.ones([np.shape(auxX)[0], 1]), auxX])
+    lineY = np.dot(auxX, Theta)
+    plt.plot(lineX, lineY, c="limegreen")
 
-    plt.title(f"Polynomial regression ($\lambda$={lamda}")
+    plt.title(f"Polynomial regression ($\lambda$={lamda})")
     plt.xlabel("Change in water level (x)")
     plt.ylabel("Water flowing out of the dam (y)")
     plt.savefig("figura3.png")
