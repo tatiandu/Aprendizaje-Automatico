@@ -75,6 +75,7 @@ def curvas_aprendizaje(X, Xval, y, yval, lamda, nombrePlot):
         fmin = opt.minimize(fun=coste, x0=Theta, args=(X_aux[:i], y[:i], lamda))
         errors.append(error(fmin.x, X_aux[:i], y[:i]))
         errorsval.append(error(fmin.x, Xval_aux, yval))
+
     grafica_curvas_aprendizaje(m, errors, errorsval, lamda, nombrePlot)
 
 
@@ -120,8 +121,8 @@ def regresion_polinomial(X, Xval, y, yval, lamda, p, nombrePlot1, nombrePlot2):
     Xval_norm = (genera_datos(Xval, p) - mu)/sigma #Normalizamos
     
     curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, lamda, nombrePlot2)
-    #curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, 1, "figura5")
-    #curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, 100, "figura6")
+    curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, 1, nombrePlot2 + "-1")
+    curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, 100, nombrePlot2 + "-2")
 
 
 def grafica_regresion_polinomial(Theta, X, y, lamda, p, mu, sigma, nombrePlot):
@@ -143,7 +144,54 @@ def grafica_regresion_polinomial(Theta, X, y, lamda, p, mu, sigma, nombrePlot):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def estimar_error(X_norm, Xtest, y, ytest, lamda, p, mu, sigma):
+    Theta = np.ones(np.shape(X_norm)[1])
 
+    Xtest_norm = genera_datos(Xtest, p)
+    Xtest_norm = (Xtest_norm - mu)/sigma #Normalizamos
+    Xtest_norm = np.hstack([np.ones([np.shape(Xtest_norm)[0], 1]), Xtest_norm])
+
+    fmin = opt.minimize(fun=coste, x0=Theta, args=(X_norm, y, lamda))
+    errorLamda = error(fmin.x, Xtest_norm, ytest)
+
+    print(f"Error obtenido para lambda = {lamda}: {str(errorLamda)[:5]}")
+
+
+def seleccion_parametro_lamda(X, Xval, Xtest, y, yval, ytest, p, nombrePlot):
+    lamdas = [0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10]
+
+    X_norm, mu, sigma = normaliza_matriz(genera_datos(X, p))
+    X_norm = np.hstack([np.ones([np.shape(X_norm)[0], 1]), X_norm])
+    Theta = np.ones(np.shape(X_norm)[1])
+
+    Xval_norm = (genera_datos(Xval, p) - mu)/sigma #Normalizamos
+    Xval_norm = np.hstack([np.ones([np.shape(Xval_norm)[0], 1]), Xval_norm])
+
+    errors = []
+    errorsval = []
+
+    for lamda in lamdas:
+        fmin = opt.minimize(fun=coste, x0=Theta, args=(X_norm, y, lamda))
+        errors.append(error(fmin.x, X_norm, y))
+        errorsval.append(error(fmin.x, Xval_norm, yval))
+
+    grafica_seleccion_lamda(lamdas, errors, errorsval, nombrePlot)
+
+    #Sabemos que la lamda mejor es 3
+    estimar_error(X_norm, Xtest, y, ytest, 3, p, mu, sigma)
+
+ 
+def grafica_seleccion_lamda(lamdas, errors, errorsval, nombrePlot):
+    plt.figure()
+
+    plt.plot(lamdas, errors, c="orange", label="Train")
+    plt.plot(lamdas, errorsval, c="limegreen", label="Cross Validation")
+
+    plt.legend()
+    plt.title("Selecting $\lambda$ using a cross validation set")
+    plt.xlabel("lambda")
+    plt.ylabel("Error")
+    plt.savefig(nombrePlot + ".png")
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -155,10 +203,10 @@ def main():
     lamda = 0
     p = 8
 
-    #regresion_lineal_reg(X, y, lamda, "figura1")
-    #curvas_aprendizaje(X, Xval, y, yval, lamda, "figura2")
+    regresion_lineal_reg(X, y, lamda, "figura1")
+    curvas_aprendizaje(X, Xval, y, yval, lamda, "figura2")
     regresion_polinomial(X, Xval, y, yval, lamda, p, "figura3", "figura4")
-
+    seleccion_parametro_lamda(X, Xval, Xtest, y, yval, ytest, p, "figura5")
 
 
 main()
