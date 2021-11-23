@@ -35,7 +35,7 @@ def regresion_lineal_reg(X, y, lamda, nombrePlot):
     #Calculo del valor de Theta que minimiza el error sobre los ejemplos de entrenamiento
     lamda = 0
     fmin = opt.minimize(fun=coste, x0=Theta, args=(X_aux, y, lamda))
-    #grafica_regresion_lineal_reg(fmin.x, X, y, nombrePlot)
+    grafica_regresion_lineal_reg(fmin.x, X, y, nombrePlot)
 
     return fmin.x
 
@@ -51,7 +51,6 @@ def grafica_regresion_lineal_reg(Theta, X, y, nombrePlot):
     maxY = Theta[0] + Theta[1] * maxX
     plt.plot([minX, maxX], [minY, maxY], c="limegreen")
 
-    #plt.ylim(-10, 40)
     plt.xlabel("Change in water level (x)")
     plt.ylabel("Water flowing out of the dam (y)")
     plt.savefig(nombrePlot + ".png")
@@ -64,10 +63,10 @@ def error(Theta, X, y):
 
 
 def curvas_aprendizaje(X, Xval, y, yval, lamda, nombrePlot):
-    m = np.shape(X)[0] 
-    Theta = np.array([1,1])
+    m = np.shape(X)[0]
     X_aux = np.hstack([np.ones([m, 1]), X])
     Xval_aux = np.hstack([np.ones([np.shape(Xval)[0], 1]), Xval])
+    Theta = np.ones(np.shape(X_aux)[1])
 
     errors = []
     errorsval = []
@@ -76,17 +75,17 @@ def curvas_aprendizaje(X, Xval, y, yval, lamda, nombrePlot):
         fmin = opt.minimize(fun=coste, x0=Theta, args=(X_aux[:i], y[:i], lamda))
         errors.append(error(fmin.x, X_aux[:i], y[:i]))
         errorsval.append(error(fmin.x, Xval_aux, yval))
-    grafica_curvas_aprendizaje(m, errors, errorsval, nombrePlot)
+    grafica_curvas_aprendizaje(m, errors, errorsval, lamda, nombrePlot)
 
 
-def grafica_curvas_aprendizaje(m, errors, errorsval, nombrePlot):
+def grafica_curvas_aprendizaje(m, errors, errorsval, lamda, nombrePlot):
     plt.figure()
 
     plt.plot(range(1, m+1), errors, c="orange", label="Train")
     plt.plot(range(1, m+1), errorsval, c="limegreen", label="Cross Validation")
 
     plt.legend()
-    plt.title("Learning curve for linear regression")
+    plt.title(f"Learning curve for linear regression ($\lambda$={lamda})")
     plt.xlabel("Number of training examples")
     plt.ylabel("Error")
     plt.savefig(nombrePlot + ".png")
@@ -111,24 +110,18 @@ def genera_datos(X, p):
 
 
 def regresion_polinomial(X, Xval, y, yval, lamda, p, nombrePlot1, nombrePlot2):
-    Theta = np.zeros(p+1)
     X_norm, mu, sigma = normaliza_matriz(genera_datos(X, p))
     X_norm = np.hstack([np.ones([np.shape(X_norm)[0], 1]), X_norm])
+    Theta = np.ones(np.shape(X_norm)[1])
 
     fmin = opt.minimize(fun=coste, x0=Theta, args=(X_norm, y, lamda))
-    #grafica_regresion_polinomial(fmin.x, X, y, lamda, p, mu, sigma, nombrePlot1)
+    grafica_regresion_polinomial(fmin.x, X, y, lamda, p, mu, sigma, nombrePlot1)
 
-    auxXval = genera_datos(Xval, p)
-    Xval_norm = (auxXval - mu)/sigma #Normalizamos
-    #Xval_norm = np.hstack([np.ones([np.shape(Xval_norm)[0], 1]), Xval_norm])
-
-    print(np.shape(X_norm))     #12, 9
-    print(np.shape(Xval_norm))  #21, 8
-    print(np.shape(y))          #12,
-    print(np.shape(yval))       #21,
-    print(np.shape(X_norm[:, 1:])) #12, 8
+    Xval_norm = (genera_datos(Xval, p) - mu)/sigma #Normalizamos
     
-    #curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, lamda, nombrePlot2)
+    curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, lamda, nombrePlot2)
+    #curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, 1, "figura5")
+    #curvas_aprendizaje(X_norm[:,1:], Xval_norm, y, yval, 100, "figura6")
 
 
 def grafica_regresion_polinomial(Theta, X, y, lamda, p, mu, sigma, nombrePlot):
@@ -147,9 +140,6 @@ def grafica_regresion_polinomial(Theta, X, y, lamda, p, mu, sigma, nombrePlot):
     plt.xlabel("Change in water level (x)")
     plt.ylabel("Water flowing out of the dam (y)")
     plt.savefig(nombrePlot + ".png")
-
-
-
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
