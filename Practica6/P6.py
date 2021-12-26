@@ -55,16 +55,24 @@ def eleccion_params():
     valores = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
     n = len(valores)
     errors = np.empty((n, n))
-
+    k, l = 0, 0
     for c in valores:
+        l = 0
         for sigma in valores:
             svm = SVC(kernel="rbf", C=c, gamma=1 / ( 2 * sigma**2))
-            svm.fit(X, y)
-            errors[c, sigma] = svm.score(Xval, yval)
-
+            svm.fit(X, y.ravel())
+            errors[k, l] = svm.score(Xval, yval)
+            l+= 1
+        k+=1
     cOptima = errors.argmax() // n
     sigmaOptima = errors.argmax() % n
-    svm = SVC(kernel="rbf", C=c, gamma=1 / ( 2 * sigma**2))
+    print("cOpt: " + str(cOptima) + ". sigmaOp: " + str(sigmaOptima))
+    print("min error: " + str(1- errors.max()))
+    svm = SVC(kernel="rbf", C=0.01*3**cOptima, gamma=1 / ( 2 * (0.01*3**sigmaOptima)**2))
+    svm.fit(X, y)
+    
+    nombreFigura = f"kernelGaussianoEleccionParams"
+    visualize_boundary(X, y.ravel(), svm, nombreFigura)
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
