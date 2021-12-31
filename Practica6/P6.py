@@ -40,7 +40,7 @@ def kernel_gaussiano(c, sigma):
     datos = loadmat("ex6data2.mat")
     X, y = datos["X"], datos["y"].ravel()
 
-    svm = SVC(kernel="rbf", C=c, gamma=1 / ( 2 * sigma**2))
+    svm = SVC(kernel="rbf", C=c, gamma=1 / (2 * sigma**2))
     svm.fit(X, y)
 
     nombreFigura = f"kernelGaussiano_c{c}_s{sigma}"
@@ -52,28 +52,30 @@ def eleccion_params():
     X, y = datos["X"], datos["y"].ravel()
     Xval, yval = datos["Xval"], datos["yval"].ravel()
 
-    valores = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
-    n = len(valores)
-    errors = np.empty((n, n))
-    k, l = 0, 0
-    for c in valores:
-        l = 0
-        for sigma in valores:
-            svm = SVC(kernel="rbf", C=c, gamma=1 / ( 2 * sigma**2))
-            svm.fit(X, y.ravel())
-            errors[k, l] = svm.score(Xval, yval)
-            l+= 1
-        k+=1
-    cOptima = errors.argmax() // n
-    sigmaOptima = errors.argmax() % n
-    print("cOpt: " + str(cOptima) + ". sigmaOp: " + str(sigmaOptima))
-    print("min error: " + str(1- errors.max()))
-    svm = SVC(kernel="rbf", C=0.01*3**cOptima, gamma=1 / ( 2 * (0.01*3**sigmaOptima)**2))
+    C_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
+    sigma_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
+    scores = np.zeros((len(C_vec), len(sigma_vec)))
+
+    i = 0
+    for c in C_vec:
+        j = 0
+        for sigma in sigma_vec:
+            svm = SVC(kernel="rbf", C=c, gamma=1 / (2 * sigma**2))
+            svm.fit(X, y)
+            scores[i,j] = svm.score(Xval, yval)
+            j += 1
+        i += 1
+
+    cOptima = C_vec[scores.argmax() // len(sigma_vec)]
+    sigmaOptima = sigma_vec[scores.argmax() % len(sigma_vec)]
+    minError = 1 - scores.max()
+    print(f"Eleccion de parametros kernel gaussiano: min error = {str(minError)[:5]}")
+
+    svm = SVC(kernel="rbf", C=cOptima, gamma=1 / (2 * sigmaOptima**2))
     svm.fit(X, y)
     
-    nombreFigura = f"kernelGaussianoEleccionParams"
-    visualize_boundary(X, y.ravel(), svm, nombreFigura)
-
+    nombreFigura = f"kernelGaussiano_ElecParam_c{cOptima}_s{sigmaOptima}"
+    visualize_boundary(X, y, svm, nombreFigura)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
