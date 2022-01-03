@@ -7,6 +7,10 @@ from sklearn.svm import SVC
 from get_vocab_dict import getVocabDict
 from process_email import email2TokenList
 
+import glob
+import codecs
+from sklearn.model_selection import train_test_split
+
 
 def visualize_boundary(X, y, svm, file_name):
     x1 = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
@@ -79,11 +83,104 @@ def eleccion_params():
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def procesar_emails(nombreArchivo, diccionario):
+    aux = "emails/" + nombreArchivo + "/*.txt"
+    #cualquier archivo que esté en el direcctorio "emails/nombreArchivo" y tenga extension .txt
+    mensajes = glob.glob(aux)
+
+    X = np.zeros((len(mensajes), len(diccionario)))
+    y_template = np.zeros(len(mensajes))
+
+    i = 0
+    for m in mensajes:
+        email_contents = codecs.open(m, "r", encoding="utf-8", errors="ignore").read()
+        tokens = email2TokenList(email_contents)
+        words = filter(None, [diccionario.get(x) for x in tokens])
+
+        for w in words: #se marcan las palabras que aparecen en la matriz X con un 1
+            X[i, w-1] = 1
+
+        i+=1
+
+    return X, y_template
+
+
+def generar_datos():
+    diccionario = getVocabDict()
+
+    X_spam, aux = procesar_emails("spam", diccionario)
+    y_spam = np.ones_like(aux)
+    X_easy, aux = procesar_emails("easy_ham", diccionario)
+    y_easy = np.zeros_like(aux)
+    X_hard, aux = procesar_emails("hard_ham", diccionario)
+    y_hard = np.zeros_like(aux)
+
+    # usamos como "INF" un numero muy grande para procesar todos los mails
+    # INF = 1000000
+    # Xval_spam, aux = procesar_emails("spam", nTrain_Spam, INF, diccionario)
+    # yval_spam = np.ones_like(aux)
+    # Xval_easy, aux = procesar_emails("easy_ham", nTrain_Easy, INF, diccionario)
+    # yval_easy = np.zeros(aux)
+    # Xval_hard, aux = procesar_emails("hard_ham", nTrain_Hard, INF, diccionario)
+    # yval_hard = np.zeros(aux)
+
+    #datos de entrenamiento
+    X = np.concatenate((X_spam, X_easy, X_hard), axis=0)
+    y = np.concatenate([y_spam, y_easy, y_hard])
+    #datos de validacion
+    # Xval = np.concatenate((Xval_spam, Xval_easy, Xval_hard), axis=0)
+    # yval = np.concatenate([yval_spam, yval_easy, yval_hard])
+
+    #generar datos de entrenamiento, validacion y test (0.6/0.2/0.2)
+    Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=1)
+    Xtrain, Xval, ytrain, yval = train_test_split(Xtrain, ytrain, test_size=0.2, random_state=1)
+
+    return Xtrain, ytrain, Xval, yval, Xtest, ytest
+
+
+def deteccion_spam(nTrain_Spam, nTrain_Easy, nTrain_Hard):
+    Xtrain, ytrain, Xval, yval, Xtest, ytest = generar_datos(nTrain_Spam, nTrain_Easy, nTrain_Hard)
+
+    #seleccion de parametros C y sigma
+    C_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
+    sigma_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
+    scores = np.zeros((len(C_vec), len(sigma_vec)))
+
+    i = 0
+    for c in C_vec:
+        j = 0
+        for sigma in sigma_vec:
+            svm = SVC(kernel="rbf", C=c, gamma=1 / (2 * sigma**2))
+            svm.fit(Xtrain, ytrain)
+            scores[i,j] = svm.score(Xval, yval)
+            j += 1
+        i += 1
+
+    cOptima = C_vec[scores.argmax() // len(sigma_vec)]
+    sigmaOptima = sigma_vec[scores.argmax() % len(sigma_vec)]
+    minError = 1 - scores.max()
+    print(f"Detección de spam: min error = {str(minError)[:5]}")
+    print(f"C óptima: {str(cOptima)} ; sigma óptima: {str(sigmaOptima)}")
+
+    #kernel gaussiano
+    svm = SVC(kernel="rbf", C=cOptima, gamma=1 / (2 * sigmaOptima**2))
+    svm.fit(Xtrain, ytrain)
+    resFinal = svm.score(Xtest, ytest)
+    print(f"Spam clasificado correctamente: {str(resFinal*100)[:5]}%")
+    print()
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 def main():
     # kernel_lineal(1.0)
     # kernel_lineal(100.0)
     # kernel_gaussiano(1.0, 0.1)
-    eleccion_params()
+    # eleccion_params()
+
+    # spam.zip: 500 mensajes
+    # easy_ham.zip: 2551 mensajes
+    # hard_ham.zip: 250 mensajes
+    deteccion_spam(500, 1551, 0)
 
 
 main()
