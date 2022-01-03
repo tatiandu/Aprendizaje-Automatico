@@ -115,21 +115,8 @@ def generar_datos():
     X_hard, aux = procesar_emails("hard_ham", diccionario)
     y_hard = np.zeros_like(aux)
 
-    # usamos como "INF" un numero muy grande para procesar todos los mails
-    # INF = 1000000
-    # Xval_spam, aux = procesar_emails("spam", nTrain_Spam, INF, diccionario)
-    # yval_spam = np.ones_like(aux)
-    # Xval_easy, aux = procesar_emails("easy_ham", nTrain_Easy, INF, diccionario)
-    # yval_easy = np.zeros(aux)
-    # Xval_hard, aux = procesar_emails("hard_ham", nTrain_Hard, INF, diccionario)
-    # yval_hard = np.zeros(aux)
-
-    #datos de entrenamiento
     X = np.concatenate((X_spam, X_easy, X_hard), axis=0)
     y = np.concatenate([y_spam, y_easy, y_hard])
-    #datos de validacion
-    # Xval = np.concatenate((Xval_spam, Xval_easy, Xval_hard), axis=0)
-    # yval = np.concatenate([yval_spam, yval_easy, yval_hard])
 
     #generar datos de entrenamiento, validacion y test (0.6/0.2/0.2)
     Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=1)
@@ -138,8 +125,8 @@ def generar_datos():
     return Xtrain, ytrain, Xval, yval, Xtest, ytest
 
 
-def deteccion_spam(nTrain_Spam, nTrain_Easy, nTrain_Hard):
-    Xtrain, ytrain, Xval, yval, Xtest, ytest = generar_datos(nTrain_Spam, nTrain_Easy, nTrain_Hard)
+def deteccion_spam():
+    Xtrain, ytrain, Xval, yval, Xtest, ytest = generar_datos()
 
     #seleccion de parametros C y sigma
     C_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
@@ -159,6 +146,7 @@ def deteccion_spam(nTrain_Spam, nTrain_Easy, nTrain_Hard):
     cOptima = C_vec[scores.argmax() // len(sigma_vec)]
     sigmaOptima = sigma_vec[scores.argmax() % len(sigma_vec)]
     minError = 1 - scores.max()
+    print()
     print(f"Detección de spam: min error = {str(minError)[:5]}")
     print(f"C óptima: {str(cOptima)} ; sigma óptima: {str(sigmaOptima)}")
 
@@ -180,7 +168,7 @@ def main():
     # spam.zip: 500 mensajes
     # easy_ham.zip: 2551 mensajes
     # hard_ham.zip: 250 mensajes
-    deteccion_spam(500, 1551, 0)
+    deteccion_spam()
 
 
 main()
