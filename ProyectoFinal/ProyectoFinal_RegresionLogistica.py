@@ -1,7 +1,7 @@
 from scipy.io import loadmat
 import scipy.optimize as opt
 import numpy as np
-import matplotlib.pyplot as plt
+import time
 
 
 def sigmoide(z): #g(z)
@@ -57,25 +57,27 @@ def evaluacion_regresion(X, y, Theta):
 
 
 def main():
-    datos = loadmat("birdData.mat")
+    datos = loadmat("birdData3.mat")
     X = datos["X"]
     y = datos["y"]
     y = np.ravel(y)
 
-    #selecciona aleatoriamente 10 ejemplos y los pinta
-    # sample = np.random.choice(X.shape[0], 10)
-    # plt.figure()
-    # plt.imshow(X[sample, :].reshape(-1, 20).T)
-    # plt.axis("off")
-    # plt.savefig("fig1.png")
+    tic = time.time()
 
     #el num de especies a identificar
-    n_labels = 8
+    n_labels = 3
+
     reg = 0.1
     X_aux = np.hstack([np.ones([np.shape(X)[0], 1]), X])
     Theta = oneVsAll(X_aux, y, n_labels, reg)
     evaluacion = evaluacion_regresion(X_aux, y, Theta)
+
+    toc = time.time()
+    tTotal = toc - tic
+
     print("Evaluación de la regresión logística multiclase: " + str(evaluacion*100)[:5] + "%")
+    print(f"----- ProyectoFinal_RegresionLogistica.py: Tiempo de ejecución: {tTotal // 60} min {str(tTotal % 60)[:5]} s")
+    print()
 
 
 main()

@@ -27,14 +27,13 @@ def support_vector_machines(Xtrain, ytrain, Xval, yval, Xtest, ytest):
     print(f"C óptima: {str(cOptima)} ; sigma óptima: {str(sigmaOptima)}")
 
     #kernel gaussiano
-    svm = SVC(kernel="rbf", C=cOptima, gamma=1 / (2 * sigmaOptima**2))
+    svm = SVC(kernel="linear", C=cOptima)
     svm.fit(Xtrain, ytrain)
     resFinal = svm.score(Xtest, ytest)
-    print(f"Especies de aves clasificadas correctamente: {str(resFinal*100)[:5]}%")
-
+    print(f"Especies de aves clasificadas correctamente con kernel lineal: {str(resFinal*100)[:5]}%")
 
 def main():
-    datos = loadmat("birdData.mat")
+    datos = loadmat("birdData8.mat")
     Xtrain, ytrain = datos["X"], datos["y"].ravel()
     Xval, yval = datos["Xval"], datos["yval"].ravel()
     Xtest, ytest = datos["Xtest"], datos["ytest"].ravel()
