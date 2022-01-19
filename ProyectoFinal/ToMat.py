@@ -5,6 +5,8 @@ import matplotlib as plt
 from matplotlib import image
 import scipy.io as sciOutput
 
+from scipy.io import loadmat
+
 
 #guarda una serie de imagenes .jpg en una lista
 def read_paths(path):
@@ -41,11 +43,6 @@ def process_img_list(X, y, listImages, size, typeIndex):
 def images_to_mat(path, matName, size):
     imgType = ["CAPUCHINBIRD",
             "COCK OF THE ROCK",
-            "FRIGATE",
-            "GANG GANG COCKATOO",
-            "GO AWAY BIRD",
-            "IWI",
-            "TIT MOUSE",
             "UMBRELLA BIRD"]
 
     matX = []
@@ -88,7 +85,7 @@ def main():
     tic = time.time()
 
     #img size_ 100x100x3
-    images_to_mat("data", "birdData.mat", 100)
+    images_to_mat("data3especies", "birdData3.mat", 100)
 
     toc = time.time()
     tTotal = toc - tic

@@ -69,7 +69,8 @@ def main():
     # plt.axis("off")
     # plt.savefig("fig1.png")
 
-    n_labels = 10
+    #el num de especies a identificar
+    n_labels = 8
     reg = 0.1
     X_aux = np.hstack([np.ones([np.shape(X)[0], 1]), X])
     Theta = oneVsAll(X_aux, y, n_labels, reg)
