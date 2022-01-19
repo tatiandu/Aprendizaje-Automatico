@@ -47,8 +47,6 @@ def images_to_mat(path, matName, size):
             "IWI",
             "TIT MOUSE",
             "UMBRELLA BIRD"]
-    
-    totalImgs = 0
 
     matX = []
     matY = []
@@ -56,9 +54,6 @@ def images_to_mat(path, matName, size):
     matYval = []
     matXtest = []
     matYtest = []
-    
-    #indices de cada tipo de imagen en el .mat
-    y = np.array({0, 1, 2, 3, 4, 5, 6, 7}) #todo esto no es un array [1, 2, 3, etc.]
 
     #leemos las imagenes por tipo
     for type in imgType:
@@ -92,8 +87,8 @@ def main():
     #medimos el tiempo que tarda en crearse el .mat
     tic = time.time()
 
-    #img size_ 224x224x3
-    images_to_mat("data", "birdData.mat", 224)
+    #img size_ 100x100x3
+    images_to_mat("data", "birdData.mat", 100)
 
     toc = time.time()
     tTotal = toc - tic
