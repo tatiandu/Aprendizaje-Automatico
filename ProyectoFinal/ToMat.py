@@ -4,7 +4,6 @@ import glob #para leer los archivos
 import matplotlib as plt
 from matplotlib import image
 import scipy.io as sciOutput
-from scipy.io import loadmat
 
 
 #guarda una serie de imagenes .jpg en una lista
@@ -38,7 +37,7 @@ def process_img_list(X, y, listImages, size, typeIndex):
             y.append(typeIndex)
 
 
-#transforma una serie de imagenes .jpg del mismo tamaño en un archivo .mat
+#transforma una serie de imagenes .jpg del mismo tamanio en un archivo .mat
 def images_to_mat(path, matName, size):
     imgType = ["CAPUCHINBIRD",
             "COCK OF THE ROCK",
@@ -71,22 +70,15 @@ def images_to_mat(path, matName, size):
         #procesamos las imagenes una a una
             #entrenamiento
         process_img_list(matX, matY, imgsTrain, size, imgType.index(type))
-        # matX = np.vstack([matX, auxX]) if matX.size else auxX
-        # matY = np.vstack([matY, auxY]) if matY.size else auxY
             #validacion
         process_img_list(matXval, matYval, imgsVal, size, imgType.index(type))
-        # matXval = np.vstack([matXval, auxX]) if matXval.size else auxX
-        # matYval = np.vstack([matYval, auxY]) if matYval.size else auxY
             #test
         process_img_list(matXtest, matYtest, imgsTest, size, imgType.index(type))
-        # matXtest = np.vstack([matXtest, auxX]) if matXtest.size else auxX
-        # matYtest = np.vstack([matYtest, auxY]) if matYtest.size else auxY
 
     dictionary = {
         "X": matX,
         "y": matY,
         "Xval": matXval,
-
         "yval": matYval,
         "Xtest": matXtest,
         "ytest": matYtest
