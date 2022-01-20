@@ -1,10 +1,6 @@
 from scipy.io import loadmat
 import scipy.optimize as opt
 import numpy as np
-import matplotlib.pyplot as plt
-
-import displayData as dD
-import checkNNGradients as checkNNG
 
 from scipy.special import expit
 import time
@@ -115,7 +111,6 @@ def main():
     for i in range(m):
         y_onehot[i][aux_y[i]] = 1
         
-    # Nosotros solo teníamos un valor para cada uno. Podemos probar con valores distintos.
     n_hidden = [25, 75, 100]
     lamdas = [0.01, 0.1, 1, 10, 50, 100]
     n_iterations = 50
@@ -127,7 +122,7 @@ def main():
         for numH in n_hidden:
             print("Probando para Lamda= " + str(l) + " y numero de capas= " + str(numH))
             #Aprendizaje de los parámetros
-            Theta1 = pesosAleatorios(n_input, numH) # Theta1 = pesosAleatorios(len(X[0]), n_hidden) ????????
+            Theta1 = pesosAleatorios(n_input, numH)
             Theta2 = pesosAleatorios(numH, n_labels)
             params_rn = np.concatenate((np.ravel(Theta1), np.ravel(Theta2)))
 
@@ -144,16 +139,6 @@ def main():
     print("Mejor resultado: {}%".format(str(results[optRes]*100)[:5]) + "con Lamda: " + str(lamdas[optRes]) + " y " + str(n_hiddens[optRes]) + " capas ocultas.")
     tTotal = toc - tic
     print(f"----- ProyectoFinal_RedesNeuronales.py: Tiempo de ejecución: {tTotal // 60} min {str(tTotal % 60)[:5]} s")
-    # lamda = 1
-    # print("--Comprobación del gradiente--")
-    # diff = checkNNG.checkNNGradients(back_propagate, lamda)
-    # print("Menor diferencia: " + str(min(diff)))
-    # print("Mayor diferencia: " + str(max(diff)))
-    # print()
-    
-    # #n_iters = 70
-    # evaluacion = comprobar(resOpt, n_input, n_hidden, n_labels, X, y)
-    # print("Evaluación del entrenamiento de la red: {}%".format(str(evaluacion*100)[:5]))
     
 
 main()

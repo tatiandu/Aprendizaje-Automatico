@@ -5,9 +5,6 @@ import matplotlib as plt
 from matplotlib import image
 import scipy.io as sciOutput
 
-from scipy.io import loadmat
-
-
 #guarda una serie de imagenes .jpg en una lista
 def read_paths(path):
     auxPath = path + "/*.jpg"
